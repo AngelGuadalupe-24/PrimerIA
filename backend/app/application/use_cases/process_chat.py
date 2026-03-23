@@ -13,42 +13,31 @@ from app.config.settings import REDIS_URL, MAX_MESSAGE_LENGTH
 
 logger = logging.getLogger("process_chat")
 
-# ===============================
-# ⚠️ SpaCy (opcional)
-# ===============================
-import spacy
-
-try:
-    nlp = spacy.load("es_core_news_sm")
-except Exception:
-    nlp = None
-    logger.warning("SpaCy no disponible - análisis emocional desactivado")
 
 # ===============================
-# Emociones
+# Emociones (SIN spacy)
 # ===============================
 EMOTION_KEYWORDS = {
-    "malestar": ["estrés","agobiado","preocup","cansado","sobrepasado","ansiedad"],
-    "tristeza": ["triste","deprimido","desanimado","melancolía","vacío"],
-    "frustracion": ["frustrado","enojado","molesto","irritado","impotencia"],
-    "soledad": ["solo","abandono","aislado","desconectado"]
+    "malestar": ["estrés", "agobiado", "preocup", "cansado", "sobrepasado", "ansiedad"],
+    "tristeza": ["triste", "deprimido", "desanimado", "melancolía", "vacío"],
+    "frustracion": ["frustrado", "enojado", "molesto", "irritado", "impotencia"],
+    "soledad": ["solo", "abandono", "aislado", "desconectado"]
 }
 
 def analizar_emocion(msg_text: str):
-    if not nlp:
-        return []
+    """
+    Análisis simple por keywords.
+    Estable, sin dependencias pesadas.
+    """
+    msg_text = msg_text.lower()
 
-    try:
-        doc = nlp(msg_text.lower())
-        tokens = [t.lemma_ for t in doc if not t.is_stop]
+    emociones_detectadas = [
+        emo for emo, palabras in EMOTION_KEYWORDS.items()
+        if any(p in msg_text for p in palabras)
+    ]
 
-        return [
-            emo for emo, palabras in EMOTION_KEYWORDS.items()
-            if any(p in tokens for p in palabras)
-        ]
-    except Exception as e:
-        logger.error(f"Error en análisis emocional: {e}")
-        return []
+    return emociones_detectadas
+
 
 # ===============================
 # Redis
@@ -64,6 +53,7 @@ async def get_history(user_id: str):
     except Exception as e:
         logger.error(f"Redis error (get_history): {e}")
         return []
+
 
 # ===============================
 # Prompt
@@ -97,6 +87,7 @@ Emociones detectadas:
 
 Respuesta:
 """
+
 
 # ===============================
 # Use Case
@@ -138,7 +129,7 @@ class ProcessChatUseCase:
         logger.info(f"Respuesta generada: {ai_response}")
 
         # ===============================
-        # Persistencia Redis (segura)
+        # Persistencia Redis
         # ===============================
         timestamp = datetime.utcnow().isoformat()
 
