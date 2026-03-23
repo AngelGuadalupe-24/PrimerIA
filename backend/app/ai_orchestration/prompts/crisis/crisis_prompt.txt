@@ -1,0 +1,2 @@
+Detecta si el usuario está en crisis emocional o riesgo suicida. 
+Si hay señales de riesgo, alerta inmediatamente y ofrece recursos de ayuda (teléfonos de emergencia o contacto con especialista).

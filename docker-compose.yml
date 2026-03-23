@@ -1,0 +1,34 @@
+
+services:
+  redis-server:
+    image: redis:7
+    container_name: redis-server
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+
+  backend:
+    build: ./backend
+    container_name: primeria-backend
+    depends_on:
+      - redis-server
+      - ollama
+    env_file:
+      - ./backend/.env
+    ports:
+      - "8000:8000"
+    environment:
+      - OLLAMA_URL=http://ollama:11434/api/generate
+
+volumes:
+  redis-data:
+  ollama-data:

@@ -1,0 +1,2 @@
+Según el estado emocional detectado y el contexto del usuario, sugiere una intervención breve y práctica. 
+Si hay riesgo alto, indica recomendar asistencia profesional inmediata.

@@ -1,0 +1,2 @@
+Analiza el siguiente mensaje del usuario y clasifica la emoción predominante: alegría, tristeza, enojo, miedo, sorpresa, neutral. 
+Devuelve solo el nombre de la emoción y un puntaje de 0 a 1 indicando la intensidad.
